@@ -1,0 +1,17 @@
+package com.pulsepass.repository;
+
+import com.pulsepass.domain.Artist;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+/** FR-ART-001, FR-ART-002. */
+public interface ArtistRepository extends JpaRepository<Artist, Long> {
+
+    Optional<Artist> findByStageName(String stageName);
+
+    Optional<Artist> findByStageNameIgnoreCase(String stageName);
+
+    List<Artist> findByActiveTrueOrderByStageNameAsc();
+}
