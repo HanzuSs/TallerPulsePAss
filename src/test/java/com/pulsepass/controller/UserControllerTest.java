@@ -9,6 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.pulsepass.security.JwtService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,10 +38,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * TEST-CTRL-USR-001..005, AC-CTRL007/008).
  */
 @WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockUser(username = "1", roles = "USER")
 class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @MockitoBean
     private UserService userService;

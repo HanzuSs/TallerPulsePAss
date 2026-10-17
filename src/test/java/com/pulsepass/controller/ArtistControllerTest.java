@@ -6,6 +6,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.pulsepass.security.JwtService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -29,10 +32,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * TEST-CTRL-ART-001..004).
  */
 @WebMvcTest(ArtistController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ArtistControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @MockitoBean
     private ArtistService artistService;

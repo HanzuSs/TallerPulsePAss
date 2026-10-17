@@ -20,13 +20,13 @@ class FlywayMigrationIT extends AbstractPostgresIT {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    @DisplayName("QT-001: V1, V2 y V3 se aplican en orden desde una base vacia")
+    @DisplayName("QT-001: V1, V2, V3 y V4 se aplican en orden desde una base vacia")
     void migrationsAreApplied() {
         List<String> versions = jdbcTemplate.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE success = true ORDER BY installed_rank",
                 String.class);
 
-        assertThat(versions).containsExactly("1", "2", "3");
+        assertThat(versions).containsExactly("1", "2", "3", "4");
     }
 
     @Test

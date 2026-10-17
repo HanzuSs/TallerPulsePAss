@@ -140,6 +140,52 @@ public class TicketServiceImpl implements TicketService {
         return ticketMapper.toResponse(ticketRepository.save(ticket));
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public void authorizePurchase(String email, Long principalId, java.util.Collection<String> roles) {
+        String ownEmail = userRepository.findById(principalId).map(User::getEmail)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Invalid principal"));
+        if (email == null || !email.equalsIgnoreCase(ownEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Ticket purchase must use the authenticated user's email");
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void authorizeTicketRead(String ticketCode, Long principalId, java.util.Collection<String> roles) {
+        if (hasRole(roles, "ROLE_ADMIN") || hasRole(roles, "ROLE_STAFF")) return;
+        Ticket ticket = getTicket(ticketCode);
+        if (!ticket.getUser().getId().equals(principalId)) {
+            throw new org.springframework.security.access.AccessDeniedException("Cannot access another user's ticket");
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void authorizeTicketCancel(String ticketCode, Long principalId, java.util.Collection<String> roles) {
+        if (hasRole(roles, "ROLE_ADMIN")) return;
+        Ticket ticket = getTicket(ticketCode);
+        if (!ticket.getUser().getId().equals(principalId)) {
+            throw new org.springframework.security.access.AccessDeniedException("Cannot modify another user's ticket");
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void authorizeUserTicketList(String email, Long principalId, java.util.Collection<String> roles) {
+        if (hasRole(roles, "ROLE_ADMIN")) return;
+        String ownEmail = userRepository.findById(principalId).map(User::getEmail)
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Invalid principal"));
+        if (email == null || !email.equalsIgnoreCase(ownEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Cannot view another user's tickets");
+        }
+    }
+
+    private boolean hasRole(java.util.Collection<String> roles, String role) {
+        return roles != null && roles.contains(role);
+    }
+
     private Ticket getTicket(String ticketCode) {
         return ticketRepository.findByTicketCode(ticketCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketCode));

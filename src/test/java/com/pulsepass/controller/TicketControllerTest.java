@@ -10,6 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.pulsepass.security.JwtService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -40,10 +44,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * traduzca al codigo HTTP correcto, sin reimplementar la regla (CTRL-001).
  */
 @WebMvcTest(TicketController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockUser(username = "1", roles = "USER")
 class TicketControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @MockitoBean
     private TicketService ticketService;
