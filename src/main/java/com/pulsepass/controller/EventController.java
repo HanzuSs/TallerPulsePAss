@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +45,16 @@ public class EventController {
     /** FR-CTRL-EVT-002: 200 si existe, 404 si no. */
     @GetMapping("/{eventCode}")
     public ResponseEntity<EventResponse> findByCode(@PathVariable("eventCode") String eventCode) {
-        return ResponseEntity.ok(eventService.findByCode(eventCode));
+        EventResponse event = eventService.findByCode(eventCode);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean privileged = auth != null && auth.isAuthenticated() && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF") || a.getAuthority().equals("ROLE_ADMIN"));
+        boolean authenticated = auth != null && auth.isAuthenticated() && !(auth.getPrincipal() instanceof String);
+        if (event.status() != com.pulsepass.domain.enums.EventStatus.PUBLISHED && !privileged) {
+            if (!authenticated) throw new org.springframework.security.access.AccessDeniedException("Event is not public");
+            throw new org.springframework.security.access.AccessDeniedException("Event is not public");
+        }
+        return ResponseEntity.ok(event);
     }
 
     /** FR-CTRL-EVT-003: cartelera de eventos publicados. */
@@ -67,6 +79,11 @@ public class EventController {
     /** FR-CTRL-EVT-006: eventos en los que participa el artista indicado por nombre artistico. */
     @GetMapping("/by-artist")
     public ResponseEntity<List<EventSummaryResponse>> findByArtist(@RequestParam("stageName") String stageName) {
-        return ResponseEntity.ok(eventService.findByArtist(stageName));
+        List<EventSummaryResponse> events = eventService.findByArtist(stageName);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean privileged = auth != null && auth.isAuthenticated() && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF") || a.getAuthority().equals("ROLE_ADMIN"));
+        if (privileged) return ResponseEntity.ok(events);
+        return ResponseEntity.ok(events.stream().filter(e -> e.status() == com.pulsepass.domain.enums.EventStatus.PUBLISHED).toList());
     }
 }

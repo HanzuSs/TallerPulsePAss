@@ -6,6 +6,9 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.pulsepass.security.JwtService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,10 +33,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * El Service es un mock: no hay PostgreSQL ni logica real (NFR-CTRL-002).
  */
 @WebMvcTest(VenueController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class VenueControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     @MockitoBean
     private VenueService venueService;

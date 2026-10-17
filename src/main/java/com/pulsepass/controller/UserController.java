@@ -6,6 +6,9 @@ import com.pulsepass.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,12 +38,26 @@ public class UserController {
     /** FR-CTRL-USR-002: 200 o 404. */
     @GetMapping("/by-email")
     public ResponseEntity<UserResponse> findByEmail(@RequestParam("email") String email) {
-        return ResponseEntity.ok(userService.findByEmail(email));
+        UserResponse user = userService.findByEmail(email);
+        requireSelfOrAdmin(user.id());
+        return ResponseEntity.ok(user);
     }
 
     /** FR-CTRL-USR-003: 200 o 404. */
     @GetMapping("/by-username")
     public ResponseEntity<UserResponse> findByUsername(@RequestParam("username") String username) {
-        return ResponseEntity.ok(userService.findByUsername(username));
+        UserResponse user = userService.findByUsername(username);
+        requireSelfOrAdmin(user.id());
+        return ResponseEntity.ok(user);
+    }
+    private void requireSelfOrAdmin(Long requestedUserId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) throw new AccessDeniedException("Authentication required");
+        boolean admin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (admin) return;
+        try {
+            if (Long.valueOf(auth.getName()).equals(requestedUserId)) return;
+        } catch (NumberFormatException ignored) { }
+        throw new AccessDeniedException("You cannot access another user's profile");
     }
 }

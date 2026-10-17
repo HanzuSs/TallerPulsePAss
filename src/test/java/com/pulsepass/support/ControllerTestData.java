@@ -123,7 +123,8 @@ public final class ControllerTestData {
                   "lastName": "Gomez",
                   "phone": "+57 300 000 0000",
                   "city": "Santa Marta",
-                  "birthDate": "1998-05-20"
+                  "birthDate": "1998-05-20",
+                  "password": "PulsePassTest123!"
                 }
                 """;
     }

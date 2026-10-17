@@ -1,6 +1,7 @@
 package com.pulsepass.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -37,5 +38,20 @@ public record RegisterUserRequest(
         String city,
 
         @NotNull(message = "Birth date is required")
-        LocalDate birthDate
-) {}
+        LocalDate birthDate,
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 12, max = 72, message = "Password must contain 12 to 72 characters")
+        String password
+) {
+    /** Constructor de compatibilidad para pruebas/consumidores anteriores; el endpoint valida password. */
+    public RegisterUserRequest(String username, String email, String firstName, String lastName,
+                               String phone, String city, LocalDate birthDate) {
+        this(username, email, firstName, lastName, phone, city, birthDate, null);
+    }
+
+    @AssertTrue(message = "Password must not exceed 72 UTF-8 bytes")
+    public boolean isPasswordWithinBcryptByteLimit() {
+        return password == null || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length <= 72;
+    }
+}
