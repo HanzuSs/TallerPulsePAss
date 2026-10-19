@@ -1,0 +1,7 @@
+# Nunca versionar secretos ni evidencia con datos sensibles
+*.postman_environment.local.json
+*.secrets.*
+evidencia/
+capturas/
+*.token
+.env
