@@ -1,0 +1,6 @@
+import { Link } from 'react-router'
+import { Cargando, EstadoError, EstadoVacio, Tarjeta } from '../componentes/ui'
+import { RUTAS } from '../lib/rutas'
+import { useSedesActivas } from '../funcionalidades/catalogo/hooks'
+
+export default function ListaSedes() { const sedes = useSedesActivas(); return <div><h1 className="font-titulo text-3xl font-bold">Sedes</h1>{sedes.isPending ? <div className="mt-6 grid gap-5 sm:grid-cols-2"><Cargando/><Cargando/></div> : sedes.isError ? <div className="mt-6"><EstadoError mensaje="No pudimos cargar las sedes." reintentar={() => void sedes.refetch()}/></div> : sedes.data.length === 0 ? <div className="mt-6"><EstadoVacio mensaje="No hay sedes activas"/></div> : <div className="mt-6 grid gap-5 sm:grid-cols-2">{sedes.data.map((sede) => <Link className="rounded-xl focus-visible:outline-2 focus-visible:outline-marca-600" key={sede.code} to={RUTAS.sede(sede.code)}><Tarjeta className="h-full transition hover:shadow-md"><h2 className="font-titulo text-xl font-bold">{sede.name}</h2><p className="mt-3 text-slate-600 dark:text-slate-400">{sede.city} · Capacidad {sede.capacity}</p><span className="mt-4 inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800">ACTIVA</span></Tarjeta></Link>)}</div>}</div> }

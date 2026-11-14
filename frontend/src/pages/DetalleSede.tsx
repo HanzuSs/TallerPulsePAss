@@ -1,0 +1,6 @@
+import { Link, useParams } from 'react-router'
+import { Cargando, EstadoError, Tarjeta } from '../componentes/ui'
+import { RUTAS } from '../lib/rutas'
+import { useSede } from '../funcionalidades/catalogo/hooks'
+
+export default function DetalleSede() { const { code = '' } = useParams(); const sede = useSede(code); if (sede.isPending) return <Cargando className="h-64"/>; if (sede.isError) return <EstadoError mensaje="Sede no encontrada" reintentar={() => void sede.refetch()}/>; const datos = sede.data; return <div className="space-y-6"><Link to={RUTAS.sedes} className="font-medium text-marca-700 hover:underline">← Sedes</Link><Tarjeta><h1 className="font-titulo text-3xl font-bold">{datos.name}</h1><p className="mt-3 font-mono text-slate-600 dark:text-slate-400">{datos.code}</p><div className="mt-7 grid gap-5 sm:grid-cols-2"><div><h2 className="font-semibold">Ciudad</h2><p className="mt-1 text-slate-600 dark:text-slate-400">{datos.city}</p></div><div><h2 className="font-semibold">Capacidad</h2><p className="mt-1 text-slate-600 dark:text-slate-400">{datos.capacity} personas</p></div><div className="sm:col-span-2"><h2 className="font-semibold">Dirección</h2><p className="mt-1 text-slate-600 dark:text-slate-400">{datos.address || 'No disponible'}</p></div></div></Tarjeta></div> }

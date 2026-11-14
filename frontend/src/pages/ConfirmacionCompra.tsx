@@ -1,0 +1,7 @@
+import { Link, useParams } from 'react-router'
+import { Badge, Cargando, EstadoError, Tarjeta } from '../componentes/ui'
+import { PrecioCOP } from '../lib/formato'
+import { RUTAS } from '../lib/rutas'
+import { useTicket } from '../funcionalidades/tickets/hooks'
+
+export default function ConfirmacionCompra() { const { ticketCode = '' } = useParams(); const ticket = useTicket(ticketCode); if (ticket.isPending) return <Cargando className="mx-auto h-72 max-w-xl"/>; if (ticket.isError) return <EstadoError mensaje="Ticket no disponible"/>; const datos = ticket.data; return <Tarjeta className="mx-auto max-w-xl text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-3xl text-emerald-700">✓</div><h1 className="mt-5 font-titulo text-3xl font-bold">¡Compra realizada con éxito!</h1><p className="mt-6 text-lg font-semibold">{datos.eventName}</p><p className="mt-2 font-mono text-sm">{datos.ticketCode} · {datos.type} · {PrecioCOP(datos.price)}</p><div className="mt-3"><Badge estado={datos.status}/></div><div className="mt-8 flex flex-wrap justify-center gap-3"><Link className="rounded-lg bg-marca-600 px-4 py-3 font-semibold text-white hover:bg-marca-700" to={RUTAS.misTickets}>Ver mis tickets</Link><Link className="rounded-lg border border-slate-300 px-4 py-3 font-semibold dark:border-slate-600" to={RUTAS.eventos}>Seguir explorando</Link></div></Tarjeta> }

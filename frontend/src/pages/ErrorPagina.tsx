@@ -1,0 +1,4 @@
+import { isRouteErrorResponse, Link, useRouteError } from 'react-router'
+import { Boton, Tarjeta } from '../componentes/ui'
+import { RUTAS } from '../lib/rutas'
+export default function ErrorPagina() { const error = useRouteError(); const mensaje = isRouteErrorResponse(error) ? (error.status === 404 ? 'No encontramos esta página.' : 'No fue posible cargar esta sección.') : 'Ocurrió un error inesperado.'; return <Tarjeta className="mx-auto max-w-xl py-12 text-center"><h1 className="font-titulo text-2xl font-bold">¡Ups! Algo salió mal.</h1><p className="mt-3 text-slate-600 dark:text-slate-400">{mensaje}</p><div className="mt-7 flex justify-center gap-3"><Boton variante="secundario" onClick={() => window.location.reload()}>Reintentar</Boton><Link className="rounded-lg bg-marca-600 px-4 py-3 font-semibold text-white" to={RUTAS.inicio}>Volver al inicio</Link></div></Tarjeta> }

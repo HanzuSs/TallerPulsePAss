@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     @Override @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         UserCredential credential = credentialRepository
-                .findByUser_UsernameIgnoreCaseOrUser_EmailIgnoreCase(request.identifier(), request.identifier())
+                .findByIdentifier(request.identifier())
                 .filter(c -> c.getUser().isActive())
                 .filter(c -> passwordEncoder.matches(request.password(), c.getPasswordHash()))
                 .orElseThrow(() -> new BadCredentialsException("Invalid identifier or password"));
