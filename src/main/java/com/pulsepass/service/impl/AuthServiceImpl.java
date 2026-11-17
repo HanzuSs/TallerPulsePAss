@@ -46,7 +46,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId).filter(User::isActive)
                 .orElseThrow(() -> new BadCredentialsException("Invalid authentication"));
         Set<String> roles = roleRepository.findByUser_Id(userId).stream()
-                .map(r -> "ROLE_" + r.getRole().name()).collect(Collectors.toUnmodifiableSet());
+                .map(r -> r.getRole().name())
+                .collect(Collectors.toUnmodifiableSet());
         return new AuthenticatedUserResponse(user.getId(), user.getUsername(), user.getEmail(), roles);
     }
 }

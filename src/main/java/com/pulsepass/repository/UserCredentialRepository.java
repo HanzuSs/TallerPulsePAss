@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 
 public interface UserCredentialRepository extends JpaRepository<UserCredential, Long> {
-    Optional<UserCredential> findByUser_UsernameIgnoreCaseOrUser_EmailIgnoreCase(String username, String email);
+
 
 @Query("""
     SELECT c
